@@ -19,7 +19,7 @@ mapVis.prototype.initVis = function() {
 
     vis.colorScale = d3.scaleLinear().range(['white','steelblue']).domain([0,100]);
 
-    vis.margin = {top: 20, right: 90, bottom: 20, left: 90};
+    vis.margin = {top: 20, right: 20, bottom: 20, left: 20};
     vis.width = $("#" + vis.parentElement).width() - vis.margin.left - vis.margin.right;
     vis.height = $("#" + vis.parentElement).height() - vis.margin.top - vis.margin.bottom;
 
@@ -58,7 +58,60 @@ mapVis.prototype.initVis = function() {
         .attr('class', 'state')
         .attr("fill", 'transparent')
         .attr("stroke", 'black')
-        .attr("stroke-width", 1);
+        .attr("stroke-width", 1)
+        .on('mouseover', function(d){
+
+            // tooltip - in case one wants it
+            /*div.transition().duration(100)
+                .style('opacity', 1)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            div
+                .html(`<div class="row"><div class="col-12" style="color: lightcyan">plain text</div></div>`);*/
+
+            // set selectedState
+            selectedState = d.properties.name;
+            myBrushVis.wrangleData();
+
+            d3.select(this)
+                .attr('stroke','darkred')
+                .attr('stroke-width', 2)
+                .attr('fill', 'rgba(255,0,0,0.47)')
+                .style('opacity', 1)
+        })
+        .on('mouseout', function(d){
+
+            // tooltip
+           /* div.transition().duration(500)
+                .style('opacity', 0);*/
+
+            // reset selectedState
+            selectedState = '';
+            myBrushVis.wrangleData();
+
+            d3.select(this)
+                .attr("fill", function(){
+                    let tmpState = d.properties.name;
+                    let color;
+                    vis.displayData.forEach(state => {
+                        if (tmpState === state.state ) {
+                            color = vis.colorScale(state.average);
+                        }
+                    });
+                    return color;
+                })
+                .attr('stroke', 'rgb(14,15,85)')
+                .attr('stroke-width', 1)
+                .style('opacity', 1)
+        })
+        .on('click', function(d){
+            console.log(d3.event.pageX);
+            /*
+                        d3.select(this).attr('class', 'noState');
+                        d3.selectAll('.state').transition().duration(1000).attr('transform', 'translate(2000,0)');
+            */
+        });
+
 
     // having initialized the map, move on to wrangle data
     this.wrangleData();
@@ -114,6 +167,8 @@ mapVis.prototype.updateVis = function() {
 
     // draw states
     d3.selectAll('.state')
+        .transition()
+        .duration(400)
         .attr("fill", function(d){
             let tmpState = d.properties.name;
             let color;
@@ -132,61 +187,11 @@ mapVis.prototype.updateVis = function() {
         .attr('stroke', 'rgb(14,15,85)')
         .attr("stroke-width", 1)
         .attr('opacity', 1)
-        .on('mouseover', function(d){
-
-            // tooltip - in case one wants it
-            /*div.transition().duration(100)
-                .style('opacity', 1)
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-            div
-                .html(`<div class="row"><div class="col-12" style="color: lightcyan">plain text</div></div>`);*/
-
-            // set selectedState
-            selectedState = d.properties.name;
-            myBrushVis.wrangleData();
-
-            d3.select(this)
-                .attr('stroke','darkred')
-                .attr('stroke-width', 2)
-                .attr('fill', 'rgba(255,0,0,0.47)')
-                .style('opacity', 1)
-        })
-        .on('mouseout', function(d){
-
-            // tooltip
-            div.transition().duration(500)
-                .style('opacity', 0);
-
-            // reset selectedState
-            selectedState = '';
-            myBrushVis.wrangleData();
-
-            d3.select(this)
-                .attr("fill", function(){
-                    let tmpState = d.properties.name;
-                    let color;
-                    vis.displayData.forEach(state => {
-                        if (tmpState === state.state ) {
-                            color = vis.colorScale(state.average);
-                        }
-                    });
-                    return color;
-                })
-                .attr('stroke', 'rgb(14,15,85)')
-                .attr('stroke-width', 1)
-                .style('opacity', 1)
-        })
-        .on('click', function(d){
-            console.log(d3.event.pageX);
-/*
-            d3.select(this).attr('class', 'noState');
-            d3.selectAll('.state').transition().duration(1000).attr('transform', 'translate(2000,0)');
-*/
-        });
 };
+/*
 
 let div = d3.select("body")
     .append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
+*/

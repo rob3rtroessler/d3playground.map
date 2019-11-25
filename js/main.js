@@ -4,6 +4,7 @@
 
 // init global variables
 let myMapVis;
+let myScatterVis;
 let myBrushVis;
 
 // init globalDataSets
@@ -31,6 +32,9 @@ function initMainPage(dataArray) {
 
     // init map
     myMapVis = new mapVis('mapDiv', dataArray[0], dataArray[1]);
+
+    // init scatter
+    myScatterVis = new scatterVis('scatterDiv', dataArray[1]);
 
     // init brush
     myBrushVis = new brushVis('brushDiv', dataArray[1]);

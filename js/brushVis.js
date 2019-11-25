@@ -11,7 +11,7 @@ brushVis = function(_parentElement, _data) {
 brushVis.prototype.initVis = function() {
     let vis = this;
 
-    vis.margin = {top: 50, right: 50, bottom: 50, left: 50};
+    vis.margin = {top: 20, right: 50, bottom: 20, left: 50};
     vis.width = $("#" + vis.parentElement).width() - vis.margin.left - vis.margin.right;
     vis.height = $("#" + vis.parentElement).height() - vis.margin.top - vis.margin.bottom;
 
@@ -38,7 +38,7 @@ brushVis.prototype.initVis = function() {
         .attr('transform', `translate(${vis.width/2}, -20)`)
         .attr('text-anchor', 'middle');
 
-    // init x scale
+    // init scales
     vis.x = d3.scaleTime().range([0, vis.width]);
     vis.y = d3.scaleLinear().range([vis.height, 0]);
 
@@ -80,6 +80,8 @@ brushVis.prototype.initVis = function() {
             let currentBrushRegion = d3.event.selection;
             myMapVis.selectedRegion = [vis.x.invert(currentBrushRegion[0]), vis.x.invert(currentBrushRegion[1])];
             myMapVis.wrangleData();
+            myScatterVis.selectedRegion = [vis.x.invert(currentBrushRegion[0]), vis.x.invert(currentBrushRegion[1])];
+            myScatterVis.wrangleData();
         });
 
     // call method initVis
@@ -158,25 +160,25 @@ brushVis.prototype.updateVis = function() {
     vis.y.domain( d3.extent(vis.filteredData, function(d) { return d.average }) );
 
     // draw x & y axis
-    vis.xAxis.transition().duration(800).call(d3.axisBottom(vis.x));
-    vis.yAxis.transition().duration(800).call(d3.axisLeft(vis.y).ticks(2));
+    vis.xAxis.transition().duration(400).call(d3.axisBottom(vis.x));
+    vis.yAxis.transition().duration(400).call(d3.axisLeft(vis.y).ticks(2));
 
     // draw pathOne
     vis.pathOne.datum(vis.averageData)
-        .transition().duration(800)
+        .transition().duration(400)
         .attr("d", vis.area)
         .attr("clip-path", "url(#clip)");
 
     // draw pathTwo if selectedState
     if (selectedState !== ''){
         vis.pathTwo.datum(vis.displayData)
-            .transition().duration(800)
+            .transition().duration(400)
             .attr('fill', 'rgba(255,0,0,0.47)')
             .attr('stroke', 'darkred')
             .attr("d", vis.area);
     } else {
         vis.pathTwo.datum([vis.filteredData[1], vis.filteredData[299]])
-            .transition().duration(800)
+            .transition().duration(400)
             .attr('fill', 'rgba(255,0,0,0)')
             .attr('stroke', 'transparent')
             .attr("d", vis.area);
@@ -185,3 +187,12 @@ brushVis.prototype.updateVis = function() {
     vis.brushGroup
         .call(vis.brush);
 };
+
+
+// tooltip - in case one wants it
+/*div.transition().duration(100)
+    .style('opacity', 1)
+    .style("left", (d3.event.pageX) + "px")
+    .style("top", (d3.event.pageY - 28) + "px");
+div
+    .html(`<div class="row"><div class="col-12" style="color: lightcyan">plain text</div></div>`);*/
